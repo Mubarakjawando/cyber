@@ -312,56 +312,24 @@ tr:last-child td { border-bottom: none; }
 }
 .btn-unblock:hover { background: var(--danger-soft); }
 
-/* ================= MOBILE OVERRIDE ================= */
-/* Below 820px: the photo becomes a full-screen background layer,
-   and the form card floats on top of it as an overlay. */
+/* Mobile: drop the photo entirely and show a flat brand banner instead.
+   A tight crop of a low-res photo on a narrow panel looks worse, not
+   better, so we don't try to preserve it below this width. */
 @media (max-width: 820px) {
-  body.auth-split {
-    position: relative;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 24px;
-    overflow-x: hidden;
-  }
+  body.auth-split { flex-direction: column; }
 
   .auth-photo {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    z-index: 0;
-    padding: 24px;
+    background-image: none !important;
+    filter: none;
+    min-height: 130px;
+    padding: 22px;
   }
-
-  .auth-photo .tagline { display: none; }
-
-  .auth-form-pane {
-    position: relative;
-    z-index: 1;
-    background: transparent;
-    padding: 0;
-    width: 100%;
-    display: flex;
-    justify-content: center;
+  .auth-photo::before {
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 60%, #0B2036 100%);
+    mix-blend-mode: normal;
+    opacity: 1;
   }
-
-  body.auth-split .wordmark {
-    color: #fff;
-  }
-
-  body.auth-split .card {
-    background: rgba(255, 255, 255, 0.97);
-    box-shadow: 0 8px 28px rgba(8, 14, 20, 0.4);
-  }
-
-  body.auth-split .auth-footer {
-    position: relative;
-    z-index: 1;
-    background: rgba(8, 14, 20, 0.45);
-    border-radius: 6px;
-    padding: 8px 12px;
-    margin-top: 14px;
-  }
-  body.auth-split .auth-footer,
-  body.auth-split .auth-footer a { color: #fff; }
+  .auth-photo::after { background: none; }
+  .auth-photo .tagline { font-size: 16px; max-width: none; }
+  .auth-form-pane { padding: 32px 20px; }
 }
