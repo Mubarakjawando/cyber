@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Create staff account — TDPS</title>
+  <link rel="stylesheet" href="/css/styles.css?v=3">
+</head>
+<body class="console">
+  <div class="console-topbar">
+    <div class="system-name">TDPS Console <span>create staff account</span></div>
+    <nav>
+      <a href="/admin">Back to console</a>
+    </nav>
+  </div>
+
+  <div class="console-body" style="max-width: 480px;">
+    <div class="panel" style="padding: 24px;">
+      <h1 style="margin-top:0; font-size: 18px;">Create a staff account</h1>
+      <p style="color: var(--muted-on-console); font-size: 13.5px; margin-bottom: 20px;">
+        Set a temporary password. The staff member will use it to sign in and should change it immediately from their dashboard.
+      </p>
+
+      <% if (error) { %>
+        <div class="banner banner-danger" style="margin-bottom:16px;"><%= error %></div>
+      <% } %>
+
+      <% if (created) { %>
+        <div class="banner" style="background: var(--ok-soft); color: var(--ok); margin-bottom:16px;">
+          Account created.<br>
+          Username: <strong><%= created.username %></strong><br>
+          Temporary password: <strong><%= created.password %></strong><br>
+          Share these with the staff member directly — this won't be shown again.
+        </div>
+      <% } %>
+
+      <form method="POST" action="/admin/create-staff">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+        <div class="field">
+          <label style="color: var(--muted-on-console);">Staff username</label>
+          <input type="text" name="staff_username" required style="width:100%; padding:10px 12px; border:1px solid var(--panel-line); border-radius:6px; background: var(--console); color: var(--ink-on-console); font-family: var(--sans);">
+        </div>
+
+        <div class="field">
+          <label style="color: var(--muted-on-console);">Temporary password</label>
+          <input type="text" name="staff_password" required style="width:100%; padding:10px 12px; border:1px solid var(--panel-line); border-radius:6px; background: var(--console); color: var(--ink-on-console); font-family: var(--sans);">
+        </div>
+
+        <div class="field">
+          <label style="color: var(--muted-on-console);">Staff number (optional)</label>
+          <input type="text" name="staff_no" style="width:100%; padding:10px 12px; border:1px solid var(--panel-line); border-radius:6px; background: var(--console); color: var(--ink-on-console); font-family: var(--sans);">
+        </div>
+
+        <button type="submit" class="btn-primary" style="width:100%; margin-top:8px;">Create staff account</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

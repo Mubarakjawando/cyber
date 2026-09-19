@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Register — TDPS</title>
+  <link rel="stylesheet" href="/css/styles.css?v=3">
+</head>
+<body class="auth-split register-page">
+  <div class="auth-photo">
+    <div class="top-mark">
+      Moshood Abiola Polytechnic
+      <span class="sub">Abeokuta, Ogun State</span>
+    </div>
+    <div class="tagline">Create your student account to get started.</div>
+  </div>
+
+  <div class="auth-form-pane">
+    <div class="auth-shell">
+      <div class="wordmark" style="display:flex; align-items:center; gap:8px;">
+        <img src="/images/mapoly-crest.png" alt="MAPOLY crest" style="height:30px; width:auto; padding:2px; background:#fff; border-radius:5px; box-shadow:0 0 0 1px var(--paper-line);">
+        MAPOLY Portal Security
+      </div>
+      <div class="card">
+        <h1>Create your student account</h1>
+        <p class="subtitle">Staff and admin accounts are issued by the system administrator.</p>
+
+        <% if (error) { %>
+          <div class="banner banner-danger"><%= error %></div>
+        <% } %>
+
+        <form method="POST" action="/register">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+          <div class="field">
+            <label for="surname">Surname</label>
+            <input type="text" id="surname" name="surname" required>
+          </div>
+
+          <div class="field">
+            <label for="first_name">First name</label>
+            <input type="text" id="first_name" name="first_name" required>
+          </div>
+
+          <div class="field">
+            <label for="last_name">Last name</label>
+            <input type="text" id="last_name" name="last_name" required>
+          </div>
+
+          <div class="field">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+          </div>
+
+          <div class="field">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+          </div>
+
+          <div class="field">
+            <label for="matric_or_staff_no">Matric number</label>
+            <input type="text" id="matric_or_staff_no" name="matric_or_staff_no" placeholder="e.g. 21/69/0064">
+          </div>
+
+          <button type="submit" class="btn-primary">Create account</button>
+        </form>
+      </div>
+      <div class="auth-footer">Already have an account? <a href="/login">Sign in</a></div>
+    </div>
+  </div>
+</body>
+</html>

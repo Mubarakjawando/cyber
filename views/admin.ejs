@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Admin Console — TDPS</title>
+  <link rel="stylesheet" href="/css/styles.css?v=3">
+</head>
+<body class="console">
+  <div class="console-topbar">
+    <div class="system-name" style="display:flex; align-items:center; gap:10px;">
+      <img src="/images/mapoly-crest.png" alt="MAPOLY crest" style="height:28px; width:auto; padding:2px; background:#fff; border-radius:5px;">
+      TDPS Console <span>MAPOLY portal security</span>
+    </div>
+    <nav>
+      <a href="/admin/create-staff">Create staff account</a>
+      <a href="/dashboard">Back to portal</a>
+    </nav>
+  </div>
+
+  <div class="console-body">
+    <div class="stat-strip">
+      <div class="stat-block stat-danger">
+        <div class="num"><%= blocked.length %></div>
+        <div class="label">IPs currently blocked</div>
+      </div>
+      <div class="stat-block stat-warn">
+        <div class="num"><%= alerts.length %></div>
+        <div class="label">Alerts recorded</div>
+      </div>
+      <div class="stat-block">
+        <div class="num"><%= logins.filter(l => l.status === 'failed').length %></div>
+        <div class="label">Failed logins (recent)</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">blocklist</div>
+      <table>
+        <thead>
+          <tr>
+            <th class="mono">IP address</th>
+            <th>Reason</th>
+            <th class="mono">Blocked at</th>
+            <th class="mono">Expires</th>
+            <th>Permanent</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% blocked.forEach(b => { %>
+            <tr>
+              <td class="mono"><%= b.ip_address %></td>
+              <td><%= b.reason %></td>
+              <td class="mono"><%= b.blocked_at %></td>
+              <td class="mono"><%= b.expires_at || '—' %></td>
+              <td><span class="pill <%= b.permanent ? 'pill-danger' : 'pill-warn' %>"><%= b.permanent ? 'permanent' : 'temporary' %></span></td>
+              <td>
+                <form method="POST" action="/admin/unblock" style="margin:0;">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <input type="hidden" name="ip_address" value="<%= b.ip_address %>">
+                  <button type="submit" class="btn-unblock">Unblock</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+          <% if (blocked.length === 0) { %>
+            <tr class="empty-row"><td colspan="6">No IPs currently blocked.</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">alerts --recent</div>
+      <table>
+        <thead>
+          <tr>
+            <th class="mono">IP address</th>
+            <th>Username</th>
+            <th class="mono">Risk score</th>
+            <th>Type</th>
+            <th class="mono">Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% alerts.forEach(a => {
+               const pillClass = a.alert_type === 'brute_force_prevented' ? 'pill-danger' : 'pill-warn';
+          %>
+            <tr>
+              <td class="mono"><%= a.ip_address %></td>
+              <td><%= a.username || '—' %></td>
+              <td class="mono"><%= a.risk_score %></td>
+              <td><span class="pill <%= pillClass %>"><%= a.alert_type.replace(/_/g, ' ') %></span></td>
+              <td class="mono"><%= a.created_at %></td>
+            </tr>
+          <% }) %>
+          <% if (alerts.length === 0) { %>
+            <tr class="empty-row"><td colspan="5">No alerts recorded yet.</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">activity --live</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th class="mono">IP address</th>
+            <th>Status</th>
+            <th class="mono">Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% logins.forEach(l => { %>
+            <tr>
+              <td><%= l.username || '—' %></td>
+              <td class="mono"><%= l.ip_address %></td>
+              <td><span class="pill <%= l.status === 'success' ? 'pill-ok' : 'pill-danger' %>"><%= l.status %></span></td>
+              <td class="mono"><%= l.timestamp %></td>
+            </tr>
+          <% }) %>
+          <% if (logins.length === 0) { %>
+            <tr class="empty-row"><td colspan="4">No login activity yet.</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>
