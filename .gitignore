@@ -3,3 +3,4 @@ node_modules/
 *.db
 *.log
 sessions/
+cookies*.txt
