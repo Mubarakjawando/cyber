@@ -49,25 +49,36 @@ function initSchema() {
   `);
 
   db.exec(`
-    CREATE TABLE IF NOT EXISTS support_messages (
-      message_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    CREATE TABLE IF NOT EXISTS support_threads (
+      thread_id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER,
       username TEXT NOT NULL,
       matric_or_staff_no TEXT,
       is_guest INTEGER NOT NULL DEFAULT 0,
+      guest_token TEXT,
+      ip_address TEXT,
       subject TEXT NOT NULL,
-      message TEXT NOT NULL,
-      status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open','replied','closed')),
-      admin_reply TEXT,
+      status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open','resolved')),
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
-      replied_at TEXT
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+  `);
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS support_thread_messages (
+      message_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      thread_id INTEGER NOT NULL REFERENCES support_threads(thread_id),
+      sender TEXT NOT NULL CHECK (sender IN ('user','admin')),
+      body TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
   `);
 
   db.exec(`CREATE INDEX IF NOT EXISTS idx_login_logs_ip ON login_logs (ip_address, timestamp);`);
   db.exec(`CREATE INDEX IF NOT EXISTS idx_login_logs_username ON login_logs (username, timestamp);`);
   db.exec(`CREATE INDEX IF NOT EXISTS idx_blocked_entities_ip ON blocked_entities (ip_address);`);
-  db.exec(`CREATE INDEX IF NOT EXISTS idx_support_status ON support_messages (status, created_at);`);
+  db.exec(`CREATE INDEX IF NOT EXISTS idx_threads_status ON support_threads (status, updated_at);`);
+  db.exec(`CREATE INDEX IF NOT EXISTS idx_thread_messages_thread ON support_thread_messages (thread_id, created_at);`);
 
   console.log('✅ Database schema initialized successfully.');
 }
