@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="refresh" content="15">
+  <title>Support inbox — TDPS</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="console">
+  <div class="console-topbar">
+    <div class="system-name" style="display:flex; align-items:center; gap:10px;">
+      <img src="/images/mapoly-crest.png" alt="MAPOLY crest" style="height:28px; width:auto; padding:2px; background:#fff; border-radius:5px;">
+      TDPS Console <span>support inbox</span>
+    </div>
+    <nav>
+      <a href="/admin">Back to console</a>
+    </nav>
+  </div>
+
+  <div class="console-body" style="max-width: 760px;">
+    <% if (error) { %><div class="banner banner-danger" style="margin-bottom:16px;"><%= error %></div><% } %>
+    <% if (success) { %><div class="banner" style="background: var(--ok-soft); color: var(--ok); margin-bottom:16px;"><%= success %></div><% } %>
+
+    <% messages.forEach(m => { %>
+      <div class="panel" style="padding: 20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <div>
+            <strong style="font-size:15px;"><%= m.subject %></strong>
+            <span style="color: var(--muted-on-console); font-size:12.5px; margin-left:8px; font-family: var(--mono);">from <%= m.username %></span>
+          </div>
+          <span class="pill <%= m.status === 'open' ? 'pill-warn' : 'pill-ok' %>"><%= m.status %></span>
+        </div>
+
+        <p style="font-size:13.5px; color: var(--ink-on-console); margin: 0 0 10px;"><%= m.message %></p>
+        <p style="font-size:12px; color: var(--muted-on-console); margin:0 0 14px; font-family: var(--mono);"><%= m.created_at %></p>
+
+        <% if (m.admin_reply) { %>
+          <div style="padding:10px 12px; background: var(--console); border-radius:6px; border-left:3px solid var(--ok); margin-bottom:14px;">
+            <p style="font-size:12px; font-weight:600; color: var(--ok); margin:0 0 4px;">Your reply</p>
+            <p style="font-size:13.5px; margin:0;"><%= m.admin_reply %></p>
+            <p style="font-size:11.5px; color: var(--muted-on-console); margin:6px 0 0; font-family: var(--mono);"><%= m.replied_at %></p>
+          </div>
+        <% } %>
+
+        <form method="POST" action="/admin/support/<%= m.message_id %>/reply">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <textarea name="admin_reply" rows="3" placeholder="<%= m.admin_reply ? 'Send an updated reply...' : 'Write a reply...' %>" required
+            style="width:100%; padding:10px 12px; border:1px solid var(--panel-line); border-radius:6px; background: var(--console); color: var(--ink-on-console); font-family: var(--sans); font-size:13.5px; resize:vertical; margin-bottom:10px;"></textarea>
+          <button type="submit" class="btn-primary" style="width:auto; padding:8px 16px;"><%= m.admin_reply ? 'Update reply' : 'Send reply' %></button>
+        </form>
+      </div>
+    <% }) %>
+
+    <% if (messages.length === 0) { %>
+      <div class="panel" style="padding: 30px; text-align:center; color: var(--muted-on-console); font-style: italic;">
+        No support messages yet.
+      </div>
+    <% } %>
+  </div>
+</body>
+</html>

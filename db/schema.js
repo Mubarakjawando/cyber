@@ -48,9 +48,24 @@ function initSchema() {
     );
   `);
 
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS support_messages (
+      message_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      username TEXT NOT NULL,
+      subject TEXT NOT NULL,
+      message TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open','replied','closed')),
+      admin_reply TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      replied_at TEXT
+    );
+  `);
+
   db.exec(`CREATE INDEX IF NOT EXISTS idx_login_logs_ip ON login_logs (ip_address, timestamp);`);
   db.exec(`CREATE INDEX IF NOT EXISTS idx_login_logs_username ON login_logs (username, timestamp);`);
   db.exec(`CREATE INDEX IF NOT EXISTS idx_blocked_entities_ip ON blocked_entities (ip_address);`);
+  db.exec(`CREATE INDEX IF NOT EXISTS idx_support_status ON support_messages (status, created_at);`);
 
   console.log('✅ Database schema initialized successfully.');
 }

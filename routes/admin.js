@@ -6,6 +6,7 @@ const { getRecentLogins } = require('../db/logModel');
 const { getRecentAlerts } = require('../db/alertModel');
 const { getAllBlocked, unblockIp } = require('../db/blockModel');
 const { findUserByUsername, createUser } = require('../db/userModel');
+const { getAllMessages, getMessageById, replyToMessage, countOpenMessages } = require('../db/supportModel');
 const { generateToken } = require('../middleware/csrf');
 
 router.get('/admin', requireAdmin, (req, res) => {
@@ -67,6 +68,57 @@ router.post('/admin/create-staff', requireAdmin, async (req, res) => {
   createUser(staff_username, passwordHash, 'staff', staff_no || null);
 
   return renderWith(null, { username: staff_username, password: staff_password });
+});
+
+// --- Support inbox (admin only) ---
+router.get('/admin/support', requireAdmin, (req, res) => {
+  const messages = getAllMessages(50);
+  res.render('admin-support', {
+    username: req.session.username,
+    messages,
+    error: null,
+    success: null,
+    csrfToken: generateToken(req)
+  });
+});
+
+router.post('/admin/support/:id/reply', requireAdmin, (req, res) => {
+  const { id } = req.params;
+  const { admin_reply } = req.body;
+
+  if (!admin_reply || !admin_reply.trim()) {
+    const messages = getAllMessages(50);
+    return res.render('admin-support', {
+      username: req.session.username,
+      messages,
+      error: 'Reply cannot be empty.',
+      success: null,
+      csrfToken: generateToken(req)
+    });
+  }
+
+  const existing = getMessageById(id);
+  if (!existing) {
+    const messages = getAllMessages(50);
+    return res.render('admin-support', {
+      username: req.session.username,
+      messages,
+      error: 'Message not found.',
+      success: null,
+      csrfToken: generateToken(req)
+    });
+  }
+
+  replyToMessage(id, admin_reply.trim());
+
+  const messages = getAllMessages(50);
+  res.render('admin-support', {
+    username: req.session.username,
+    messages,
+    error: null,
+    success: 'Reply sent.',
+    csrfToken: generateToken(req)
+  });
 });
 
 module.exports = router;

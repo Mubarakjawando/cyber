@@ -6,6 +6,7 @@ const config = require('./config/env');
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 const accountRoutes = require('./routes/account');
+const supportRoutes = require('./routes/support');
 const blocklistCheck = require('./middleware/blocklistCheck');
 const { csrfProtection, generateToken } = require('./middleware/csrf');
 const seedAdmin = require('./scripts/seedAdmin');
@@ -55,6 +56,7 @@ app.get('/', (req, res) => {
 app.use('/', authRoutes);
 app.use('/', adminRoutes);
 app.use('/', accountRoutes);
+app.use('/', supportRoutes);
 
 app.get('/dashboard', (req, res) => {
   if (!req.session.userId) {
