@@ -26,9 +26,12 @@
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
           <div>
             <strong style="font-size:15px;"><%= m.subject %></strong>
-            <span style="color: var(--muted-on-console); font-size:12.5px; margin-left:8px; font-family: var(--mono);">from <%= m.username %></span>
+            <span style="color: var(--muted-on-console); font-size:12.5px; margin-left:8px; font-family: var(--mono);">from <%= m.username %><% if (m.matric_or_staff_no) { %> (<%= m.matric_or_staff_no %>)<% } %></span>
           </div>
-          <span class="pill <%= m.status === 'open' ? 'pill-warn' : 'pill-ok' %>"><%= m.status %></span>
+          <div style="display:flex; gap:8px;">
+            <% if (m.is_guest) { %><span class="pill pill-danger">unverified guest</span><% } %>
+            <span class="pill <%= m.status === 'open' ? 'pill-warn' : 'pill-ok' %>"><%= m.status %></span>
+          </div>
         </div>
 
         <p style="font-size:13.5px; color: var(--ink-on-console); margin: 0 0 10px;"><%= m.message %></p>

@@ -51,8 +51,10 @@ function initSchema() {
   db.exec(`
     CREATE TABLE IF NOT EXISTS support_messages (
       message_id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
+      user_id INTEGER,
       username TEXT NOT NULL,
+      matric_or_staff_no TEXT,
+      is_guest INTEGER NOT NULL DEFAULT 0,
       subject TEXT NOT NULL,
       message TEXT NOT NULL,
       status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open','replied','closed')),

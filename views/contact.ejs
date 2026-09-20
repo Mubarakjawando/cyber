@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Contact support — TDPS</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="auth">
+  <div class="auth-shell">
+    <div class="wordmark" style="display:flex; align-items:center; gap:8px;">
+      <img src="/images/mapoly-crest.png" alt="MAPOLY crest" style="height:30px; width:auto; padding:2px; background:#fff; border-radius:5px; box-shadow:0 0 0 1px var(--paper-line);">
+      MAPOLY Portal Security
+    </div>
+    <div class="card">
+      <h1>Contact support</h1>
+      <p class="subtitle">Can't log in, or need help with something else? Send a message below — an administrator will verify your details and get back to you.</p>
+
+      <% if (error) { %><div class="banner banner-danger"><%= error %></div><% } %>
+      <% if (success) { %><div class="banner" style="background: var(--ok-soft); color: var(--ok);"><%= success %></div><% } %>
+
+      <form method="POST" action="/contact">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+        <div class="field">
+          <label for="full_name">Full name / username</label>
+          <input type="text" id="full_name" name="full_name" required>
+        </div>
+
+        <div class="field">
+          <label for="matric_or_staff_no">Matric / staff number</label>
+          <input type="text" id="matric_or_staff_no" name="matric_or_staff_no" required placeholder="e.g. 21/69/0064">
+        </div>
+
+        <div class="field">
+          <label for="subject">Subject</label>
+          <input type="text" id="subject" name="subject" required>
+        </div>
+
+        <div class="field">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" rows="5" required style="width:100%; padding:10px 12px; border:1px solid var(--paper-line); border-radius:6px; font-family: var(--sans); font-size:14.5px; resize:vertical;"></textarea>
+        </div>
+
+        <button type="submit" class="btn-primary">Send message</button>
+      </form>
+    </div>
+    <div class="auth-footer"><a href="/login">Back to sign in</a></div>
+  </div>
+</body>
+</html>

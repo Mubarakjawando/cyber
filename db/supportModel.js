@@ -1,11 +1,11 @@
 const db = require('./connection');
 
-function createMessage({ userId, username, subject, message }) {
+function createMessage({ userId = null, username, matricOrStaffNo = null, isGuest = 0, subject, message }) {
   const stmt = db.prepare(`
-    INSERT INTO support_messages (user_id, username, subject, message)
-    VALUES (?, ?, ?, ?)
+    INSERT INTO support_messages (user_id, username, matric_or_staff_no, is_guest, subject, message)
+    VALUES (?, ?, ?, ?, ?, ?)
   `);
-  return stmt.run(userId, username, subject, message);
+  return stmt.run(userId, username, matricOrStaffNo, isGuest ? 1 : 0, subject, message);
 }
 
 function getMessagesByUsername(username) {
