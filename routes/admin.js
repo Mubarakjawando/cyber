@@ -6,7 +6,7 @@ const { getRecentLogins } = require('../db/logModel');
 const { getRecentAlerts } = require('../db/alertModel');
 const { getAllBlocked, unblockIp } = require('../db/blockModel');
 const { findUserByUsername, createUser } = require('../db/userModel');
-const { getAllMessages, getMessageById, replyToMessage, countOpenMessages } = require('../db/supportModel');
+const { getAllThreads, getThreadById, getThreadMessages, addMessage, resolveThread } = require('../db/supportModel');
 const { generateToken } = require('../middleware/csrf');
 
 router.get('/admin', requireAdmin, (req, res) => {
@@ -72,53 +72,36 @@ router.post('/admin/create-staff', requireAdmin, async (req, res) => {
 
 // --- Support inbox (admin only) ---
 router.get('/admin/support', requireAdmin, (req, res) => {
-  const messages = getAllMessages(50);
-  res.render('admin-support', {
+  const threads = getAllThreads(50);
+  res.render('admin-support', { username: req.session.username, threads });
+});
+
+router.get('/admin/support/:id', requireAdmin, (req, res) => {
+  const thread = getThreadById(req.params.id);
+  if (!thread) {
+    return res.redirect('/admin/support');
+  }
+  const messages = getThreadMessages(thread.thread_id);
+  res.render('admin-thread', {
     username: req.session.username,
+    thread,
     messages,
-    error: null,
-    success: null,
     csrfToken: generateToken(req)
   });
 });
 
 router.post('/admin/support/:id/reply', requireAdmin, (req, res) => {
-  const { id } = req.params;
-  const { admin_reply } = req.body;
-
-  if (!admin_reply || !admin_reply.trim()) {
-    const messages = getAllMessages(50);
-    return res.render('admin-support', {
-      username: req.session.username,
-      messages,
-      error: 'Reply cannot be empty.',
-      success: null,
-      csrfToken: generateToken(req)
-    });
+  const { body } = req.body;
+  const thread = getThreadById(req.params.id);
+  if (thread && body && body.trim()) {
+    addMessage(thread.thread_id, 'admin', body.trim());
   }
+  res.redirect('/admin/support/' + req.params.id);
+});
 
-  const existing = getMessageById(id);
-  if (!existing) {
-    const messages = getAllMessages(50);
-    return res.render('admin-support', {
-      username: req.session.username,
-      messages,
-      error: 'Message not found.',
-      success: null,
-      csrfToken: generateToken(req)
-    });
-  }
-
-  replyToMessage(id, admin_reply.trim());
-
-  const messages = getAllMessages(50);
-  res.render('admin-support', {
-    username: req.session.username,
-    messages,
-    error: null,
-    success: 'Reply sent.',
-    csrfToken: generateToken(req)
-  });
+router.post('/admin/support/:id/resolve', requireAdmin, (req, res) => {
+  resolveThread(req.params.id);
+  res.redirect('/admin/support');
 });
 
 module.exports = router;

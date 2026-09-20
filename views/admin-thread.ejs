@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="refresh" content="10">
+  <title><%= thread.subject %> — TDPS</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="console">
+  <div class="console-topbar">
+    <div class="system-name" style="display:flex; align-items:center; gap:10px;">
+      <img src="/images/mapoly-crest.png" alt="MAPOLY crest" style="height:28px; width:auto; padding:2px; background:#fff; border-radius:5px;">
+      TDPS Console <span>thread #<%= thread.thread_id %></span>
+    </div>
+    <nav><a href="/admin/support">Back to inbox</a></nav>
+  </div>
+
+  <div class="console-body" style="max-width: 640px;">
+    <div class="panel" style="padding:20px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+        <h1 style="margin:0; font-size:18px;"><%= thread.subject %></h1>
+        <span class="pill <%= thread.status === 'open' ? 'pill-warn' : 'pill-ok' %>"><%= thread.status %></span>
+      </div>
+      <p style="font-size:12.5px; color: var(--muted-on-console); font-family: var(--mono); margin:0 0 18px;">
+        <%= thread.username %><% if (thread.matric_or_staff_no) { %> (<%= thread.matric_or_staff_no %>)<% } %><% if (thread.is_guest) { %> — unverified guest, IP <%= thread.ip_address %><% } %>
+      </p>
+
+      <div style="max-height:360px; overflow-y:auto; margin-bottom:18px;">
+        <% messages.forEach(m => { %>
+          <div style="margin-bottom:12px; text-align: <%= m.sender === 'admin' ? 'right' : 'left' %>;">
+            <div style="display:inline-block; max-width:85%; padding:8px 12px; border-radius:10px; font-size:13.5px; text-align:left;
+              background: <%= m.sender === 'admin' ? 'var(--ok-soft)' : 'var(--panel-line)' %>;
+              color: var(--ink-on-console);">
+              <%= m.body %>
+            </div>
+            <div style="font-size:11px; color: var(--muted-on-console); margin-top:2px;"><%= m.sender === 'admin' ? 'You' : thread.username %> · <%= m.created_at %></div>
+          </div>
+        <% }) %>
+      </div>
+
+      <% if (thread.status === 'open') { %>
+        <form method="POST" action="/admin/support/<%= thread.thread_id %>/reply" style="margin-bottom:10px;">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <textarea name="body" rows="3" placeholder="Type a reply..." required
+            style="width:100%; padding:10px 12px; border:1px solid var(--panel-line); border-radius:6px; background: var(--console); color: var(--ink-on-console); font-family: var(--sans); font-size:13.5px; resize:vertical; margin-bottom:10px;"></textarea>
+          <button type="submit" class="btn-primary" style="width:auto; padding:8px 16px;">Send reply</button>
+        </form>
+
+        <form method="POST" action="/admin/support/<%= thread.thread_id %>/resolve">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button type="submit" class="btn-unblock">Mark resolved</button>
+        </form>
+      <% } else { %>
+        <p style="color: var(--muted-on-console); font-style: italic; font-size:13.5px;">This conversation is resolved. The user will need to start a new one.</p>
+      <% } %>
+    </div>
+  </div>
+</body>
+</html>

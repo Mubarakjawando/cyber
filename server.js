@@ -2,6 +2,7 @@ const express = require('express');
 const session = require('express-session');
 const FileStore = require('session-file-store')(session);
 const path = require('path');
+const cookieParser = require('cookie-parser');
 const config = require('./config/env');
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
@@ -27,6 +28,7 @@ app.set('views', path.join(__dirname, 'views'));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // The app sits behind a reverse proxy in production (Render, etc.).

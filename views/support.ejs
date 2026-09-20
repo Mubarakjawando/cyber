@@ -2,6 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
+  <% if (mode === 'chat') { %><meta http-equiv="refresh" content="10"><% } %>
   <title>Contact support — TDPS</title>
   <link rel="stylesheet" href="/css/styles.css">
 </head>
@@ -11,49 +12,50 @@
       <img src="/images/mapoly-crest.png" alt="MAPOLY crest" style="height:30px; width:auto; padding:2px; background:#fff; border-radius:5px; box-shadow:0 0 0 1px var(--paper-line);">
       MAPOLY Portal Security
     </div>
-    <div class="card" style="max-width: 480px;">
-      <h1>Contact support</h1>
-      <p class="subtitle">Report an issue or ask a question. An administrator will reply here.</p>
 
-      <% if (error) { %><div class="banner banner-danger"><%= error %></div><% } %>
-      <% if (success) { %><div class="banner" style="background: var(--ok-soft); color: var(--ok);"><%= success %></div><% } %>
+    <% if (mode === 'form') { %>
+      <div class="card" style="max-width:480px;">
+        <h1>Contact support</h1>
+        <p class="subtitle">Report an issue or ask a question. An administrator will reply here.</p>
 
-      <form method="POST" action="/support">
-        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <% if (error) { %><div class="banner banner-danger"><%= error %></div><% } %>
 
-        <div class="field">
-          <label for="subject">Subject</label>
-          <input type="text" id="subject" name="subject" required>
-        </div>
-
-        <div class="field">
-          <label for="message">Message</label>
-          <textarea id="message" name="message" rows="5" required style="width:100%; padding:10px 12px; border:1px solid var(--paper-line); border-radius:6px; font-family: var(--sans); font-size:14.5px; resize:vertical;"></textarea>
-        </div>
-
-        <button type="submit" class="btn-primary">Send message</button>
-      </form>
-    </div>
-
-    <% if (messages.length > 0) { %>
-      <div style="margin-top: 28px;">
-        <p class="subtitle" style="margin-bottom:10px;">Your previous messages</p>
-        <% messages.forEach(m => { %>
-          <div class="card" style="max-width:480px; margin-bottom:14px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-              <strong style="font-size:14.5px;"><%= m.subject %></strong>
-              <span class="pill <%= m.status === 'open' ? 'pill-warn' : 'pill-ok' %>"><%= m.status %></span>
-            </div>
-            <p style="font-size:13.5px; color: var(--muted-on-paper); margin:0 0 10px;"><%= m.message %></p>
-            <p style="font-size:12px; color: var(--muted-on-paper); margin:0;"><%= m.created_at %></p>
-            <% if (m.admin_reply) { %>
-              <div style="margin-top:12px; padding:10px 12px; background: var(--paper); border-radius:6px; border-left:3px solid var(--brand);">
-                <p style="font-size:12px; font-weight:600; color: var(--brand); margin:0 0 4px;">Administrator reply</p>
-                <p style="font-size:13.5px; margin:0;"><%= m.admin_reply %></p>
-              </div>
-            <% } %>
+        <form method="POST" action="/support">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="field">
+            <label for="subject">Subject</label>
+            <input type="text" id="subject" name="subject" required>
           </div>
-        <% }) %>
+          <div class="field">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" rows="5" required style="width:100%; padding:10px 12px; border:1px solid var(--paper-line); border-radius:6px; font-family: var(--sans); font-size:14.5px; resize:vertical;"></textarea>
+          </div>
+          <button type="submit" class="btn-primary">Send message</button>
+        </form>
+      </div>
+    <% } else { %>
+      <div class="card" style="max-width:480px;">
+        <h1><%= thread.subject %></h1>
+        <p class="subtitle">An administrator will reply here automatically.</p>
+
+        <div style="max-height:340px; overflow-y:auto; margin-bottom:16px; padding-right:4px;">
+          <% messages.forEach(m => { %>
+            <div style="margin-bottom:12px; text-align: <%= m.sender === 'admin' ? 'left' : 'right' %>;">
+              <div style="display:inline-block; max-width:85%; padding:8px 12px; border-radius:10px; font-size:13.5px; text-align:left;
+                background: <%= m.sender === 'admin' ? 'var(--paper)' : 'var(--brand)' %>;
+                color: <%= m.sender === 'admin' ? 'var(--ink-on-paper)' : '#fff' %>;">
+                <%= m.body %>
+              </div>
+              <div style="font-size:11px; color: var(--muted-on-paper); margin-top:2px;"><%= m.sender === 'admin' ? 'Support' : 'You' %> · <%= m.created_at %></div>
+            </div>
+          <% }) %>
+        </div>
+
+        <form method="POST" action="/support/reply">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <textarea name="body" rows="2" placeholder="Type a message..." required style="width:100%; padding:10px 12px; border:1px solid var(--paper-line); border-radius:6px; font-family: var(--sans); font-size:14px; resize:vertical; margin-bottom:10px;"></textarea>
+          <button type="submit" class="btn-primary">Send</button>
+        </form>
       </div>
     <% } %>
 
