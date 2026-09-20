@@ -28,7 +28,11 @@ router.post('/register', async (req, res) => {
     return res.render('register', { error: 'Surname, first name, and last name are all required.', csrfToken: generateToken(req) });
   }
 
-  if (matric_or_staff_no && !isValidMatric(matric_or_staff_no)) {
+  if (!matric_or_staff_no) {
+    return res.render('register', { error: 'Matric number is required.', csrfToken: generateToken(req) });
+  }
+
+  if (!isValidMatric(matric_or_staff_no)) {
     return res.render('register', { error: 'Matric number format is not recognized. Please check and try again.', csrfToken: generateToken(req) });
   }
 
