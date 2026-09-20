@@ -49,6 +49,17 @@ app.use(session({
 app.use(blocklistCheck);
 app.use(csrfProtection);
 
+// Prevent the browser (and its back/forward cache) from ever serving
+// a stale copy of a form page after logout/login — a cached page
+// carries a CSRF token tied to a session that may no longer exist,
+// which would fail on every retry until a real reload happens.
+app.use((req, res, next) => {
+  if (req.method === 'GET') {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  }
+  next();
+});
+
 app.get('/', (req, res) => {
   res.send('TDPS server is running.');
 });
