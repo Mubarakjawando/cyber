@@ -14,7 +14,7 @@ const config = require('../config/env');
 
 // --- Registration (students only) ---
 router.get('/register', (req, res) => {
-  res.render('register', { error: null, csrfToken: generateToken(req) });
+  res.render('register', { error: null, csrfToken: generateToken(req), session_expired: req.query.session_expired });
 });
 
 router.post('/register', async (req, res) => {
@@ -49,7 +49,7 @@ router.post('/register', async (req, res) => {
 
 // --- Login ---
 router.get('/login', (req, res) => {
-  res.render('login', { error: null, showCaptcha: false, siteKey: config.recaptchaSiteKey, csrfToken: generateToken(req) });
+  res.render('login', { error: null, showCaptcha: false, siteKey: config.recaptchaSiteKey, csrfToken: generateToken(req), session_expired: req.query.session_expired });
 });
 
 router.post('/login', async (req, res) => {

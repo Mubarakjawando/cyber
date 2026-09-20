@@ -30,6 +30,9 @@
         <% if (error) { %>
           <div class="banner <%= showCaptcha ? 'banner-warn' : 'banner-danger' %>"><%= error %></div>
         <% } %>
+        <% if (typeof session_expired !== 'undefined' && session_expired) { %>
+          <div class="banner banner-warn">Your session timed out — please sign in again.</div>
+        <% } %>
 
         <form method="POST" action="/login">
           <input type="hidden" name="_csrf" value="<%= csrfToken %>">

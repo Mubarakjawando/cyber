@@ -27,6 +27,9 @@
         <% if (error) { %>
           <div class="banner banner-danger"><%= error %></div>
         <% } %>
+        <% if (typeof session_expired !== 'undefined' && session_expired) { %>
+          <div class="banner banner-warn">Your session timed out — please try again.</div>
+        <% } %>
 
         <form method="POST" action="/register">
           <input type="hidden" name="_csrf" value="<%= csrfToken %>">
